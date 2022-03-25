@@ -1,0 +1,446 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Construct",
+          "version": "1.135.0"
+        }
+      },
+      "SecurityHubToJiraStack": {
+        "id": "SecurityHubToJiraStack",
+        "path": "SecurityHubToJiraStack",
+        "children": {
+          "SecurityHubFindings": {
+            "id": "SecurityHubFindings",
+            "path": "SecurityHubToJiraStack/SecurityHubFindings",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "SecurityHubToJiraStack/SecurityHubFindings/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SNS::Topic",
+                  "aws:cdk:cloudformation:props": {}
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-sns.CfnTopic",
+                  "version": "1.135.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "SecurityHubToJiraStack/SecurityHubFindings/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "SecurityHubToJiraStack/SecurityHubFindings/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SNS::TopicPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sns:Publish",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "events.amazonaws.com"
+                              },
+                              "Resource": {
+                                "Ref": "SecurityHubFindings4340085C"
+                              },
+                              "Sid": "0"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "topics": [
+                          {
+                            "Ref": "SecurityHubFindings4340085C"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-sns.CfnTopicPolicy",
+                      "version": "1.135.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-sns.TopicPolicy",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-sns.Topic",
+              "version": "1.135.0"
+            }
+          },
+          "lambda_role": {
+            "id": "lambda_role",
+            "path": "SecurityHubToJiraStack/lambda_role",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "SecurityHubToJiraStack/lambda_role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "roleName": "SecurityHubToJiraStackLambdaRole"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.CfnRole",
+                  "version": "1.135.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "SecurityHubToJiraStack/lambda_role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "SecurityHubToJiraStack/lambda_role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "secretsmanager:GetSecretValue",
+                              "Effect": "Allow",
+                              "Resource": "arn:aws:secretsmanager:ap-southeast-2:523431903420:secret:/prod/my-secret-api-MOS5Rz"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "lambdaroleDefaultPolicyCADF8B22",
+                        "roles": [
+                          {
+                            "Ref": "lambdarole3F9471F6"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-iam.CfnPolicy",
+                      "version": "1.135.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-iam.Policy",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-iam.Role",
+              "version": "1.135.0"
+            }
+          },
+          "JiraHandler": {
+            "id": "JiraHandler",
+            "path": "SecurityHubToJiraStack/JiraHandler",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "SecurityHubToJiraStack/JiraHandler/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "SecurityHubToJiraStack/JiraHandler/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.AssetStaging",
+                      "version": "1.135.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "SecurityHubToJiraStack/JiraHandler/Code/AssetBucket",
+                    "children": {
+                      "Notifications": {
+                        "id": "Notifications",
+                        "path": "SecurityHubToJiraStack/JiraHandler/Code/AssetBucket/Notifications",
+                        "constructInfo": {
+                          "fqn": "@aws-cdk/core.Construct",
+                          "version": "1.135.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-s3.BucketBase",
+                      "version": "1.135.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-s3-assets.Asset",
+                  "version": "1.135.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "SecurityHubToJiraStack/JiraHandler/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3Bucket00C9E3E6"
+                      },
+                      "s3Key": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            {
+                              "Fn::Select": [
+                                0,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3VersionKey1727EC66"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Fn::Select": [
+                                1,
+                                {
+                                  "Fn::Split": [
+                                    "||",
+                                    {
+                                      "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3VersionKey1727EC66"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        ]
+                      }
+                    },
+                    "role": {
+                      "Fn::GetAtt": [
+                        "lambdarole3F9471F6",
+                        "Arn"
+                      ]
+                    },
+                    "handler": "Jira.lambda_handler",
+                    "runtime": "python3.9"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-lambda.CfnFunction",
+                  "version": "1.135.0"
+                }
+              },
+              "AllowInvoke:SecurityHubToJiraStackSecurityHubFindings7B616D96": {
+                "id": "AllowInvoke:SecurityHubToJiraStackSecurityHubFindings7B616D96",
+                "path": "SecurityHubToJiraStack/JiraHandler/AllowInvoke:SecurityHubToJiraStackSecurityHubFindings7B616D96",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "JiraHandlerC07212BC",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "sns.amazonaws.com",
+                    "sourceArn": {
+                      "Ref": "SecurityHubFindings4340085C"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-lambda.CfnPermission",
+                  "version": "1.135.0"
+                }
+              },
+              "SecurityHubFindings": {
+                "id": "SecurityHubFindings",
+                "path": "SecurityHubToJiraStack/JiraHandler/SecurityHubFindings",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "SecurityHubToJiraStack/JiraHandler/SecurityHubFindings/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SNS::Subscription",
+                      "aws:cdk:cloudformation:props": {
+                        "protocol": "lambda",
+                        "topicArn": {
+                          "Ref": "SecurityHubFindings4340085C"
+                        },
+                        "endpoint": {
+                          "Fn::GetAtt": [
+                            "JiraHandlerC07212BC",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/aws-sns.CfnSubscription",
+                      "version": "1.135.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-sns.Subscription",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-lambda.Function",
+              "version": "1.135.0"
+            }
+          },
+          "AssetParameters": {
+            "id": "AssetParameters",
+            "path": "SecurityHubToJiraStack/AssetParameters",
+            "children": {
+              "70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277": {
+                "id": "70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277",
+                "path": "SecurityHubToJiraStack/AssetParameters/70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277",
+                "children": {
+                  "S3Bucket": {
+                    "id": "S3Bucket",
+                    "path": "SecurityHubToJiraStack/AssetParameters/70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277/S3Bucket",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.135.0"
+                    }
+                  },
+                  "S3VersionKey": {
+                    "id": "S3VersionKey",
+                    "path": "SecurityHubToJiraStack/AssetParameters/70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277/S3VersionKey",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.135.0"
+                    }
+                  },
+                  "ArtifactHash": {
+                    "id": "ArtifactHash",
+                    "path": "SecurityHubToJiraStack/AssetParameters/70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277/ArtifactHash",
+                    "constructInfo": {
+                      "fqn": "@aws-cdk/core.CfnParameter",
+                      "version": "1.135.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.Construct",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.135.0"
+            }
+          },
+          "SecurityHubRule": {
+            "id": "SecurityHubRule",
+            "path": "SecurityHubToJiraStack/SecurityHubRule",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "SecurityHubToJiraStack/SecurityHubRule/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Events::Rule",
+                  "aws:cdk:cloudformation:props": {
+                    "eventPattern": {
+                      "detail": {
+                        "findings": {
+                          "Severity": {
+                            "Label": [
+                              "CRITICAL",
+                              "HIGH"
+                            ]
+                          }
+                        }
+                      },
+                      "detail-type": [
+                        "Security Hub Findings - Imported"
+                      ],
+                      "source": [
+                        "aws.securityhub"
+                      ]
+                    },
+                    "state": "ENABLED",
+                    "targets": [
+                      {
+                        "id": "Target0",
+                        "arn": {
+                          "Ref": "SecurityHubFindings4340085C"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "@aws-cdk/aws-events.CfnRule",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/aws-events.Rule",
+              "version": "1.135.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "SecurityHubToJiraStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "SecurityHubToJiraStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "@aws-cdk/core.CfnResource",
+                  "version": "1.135.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "@aws-cdk/core.Construct",
+              "version": "1.135.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "@aws-cdk/core.Stack",
+          "version": "1.135.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "@aws-cdk/core.App",
+      "version": "1.135.0"
+    }
+  }
+}

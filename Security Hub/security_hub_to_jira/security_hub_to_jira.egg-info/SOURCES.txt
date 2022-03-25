@@ -1,0 +1,7 @@
+README.md
+setup.py
+security_hub_to_jira/security_hub_to_jira.egg-info/PKG-INFO
+security_hub_to_jira/security_hub_to_jira.egg-info/SOURCES.txt
+security_hub_to_jira/security_hub_to_jira.egg-info/dependency_links.txt
+security_hub_to_jira/security_hub_to_jira.egg-info/requires.txt
+security_hub_to_jira/security_hub_to_jira.egg-info/top_level.txt

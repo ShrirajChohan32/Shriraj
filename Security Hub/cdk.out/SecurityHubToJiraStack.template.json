@@ -1,0 +1,240 @@
+{
+  "Resources": {
+    "SecurityHubFindings4340085C": {
+      "Type": "AWS::SNS::Topic",
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/SecurityHubFindings/Resource"
+      }
+    },
+    "SecurityHubFindingsPolicyA665A52F": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sns:Publish",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Resource": {
+                "Ref": "SecurityHubFindings4340085C"
+              },
+              "Sid": "0"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Topics": [
+          {
+            "Ref": "SecurityHubFindings4340085C"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/SecurityHubFindings/Policy/Resource"
+      }
+    },
+    "lambdarole3F9471F6": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "RoleName": "SecurityHubToJiraStackLambdaRole"
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/lambda_role/Resource"
+      }
+    },
+    "lambdaroleDefaultPolicyCADF8B22": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "secretsmanager:GetSecretValue",
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:ap-southeast-2:523431903420:secret:/prod/my-secret-api-MOS5Rz"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "lambdaroleDefaultPolicyCADF8B22",
+        "Roles": [
+          {
+            "Ref": "lambdarole3F9471F6"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/lambda_role/DefaultPolicy/Resource"
+      }
+    },
+    "JiraHandlerC07212BC": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3Bucket00C9E3E6"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3VersionKey1727EC66"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3VersionKey1727EC66"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "lambdarole3F9471F6",
+            "Arn"
+          ]
+        },
+        "Handler": "Jira.lambda_handler",
+        "Runtime": "python3.9"
+      },
+      "DependsOn": [
+        "lambdaroleDefaultPolicyCADF8B22",
+        "lambdarole3F9471F6"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/JiraHandler/Resource",
+        "aws:asset:path": "asset.70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277",
+        "aws:asset:is-bundled": false,
+        "aws:asset:property": "Code"
+      }
+    },
+    "JiraHandlerAllowInvokeSecurityHubToJiraStackSecurityHubFindings7B616D96F8EC4E68": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "JiraHandlerC07212BC",
+            "Arn"
+          ]
+        },
+        "Principal": "sns.amazonaws.com",
+        "SourceArn": {
+          "Ref": "SecurityHubFindings4340085C"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/JiraHandler/AllowInvoke:SecurityHubToJiraStackSecurityHubFindings7B616D96"
+      }
+    },
+    "JiraHandlerSecurityHubFindingsC345CDCF": {
+      "Type": "AWS::SNS::Subscription",
+      "Properties": {
+        "Protocol": "lambda",
+        "TopicArn": {
+          "Ref": "SecurityHubFindings4340085C"
+        },
+        "Endpoint": {
+          "Fn::GetAtt": [
+            "JiraHandlerC07212BC",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/JiraHandler/SecurityHubFindings/Resource"
+      }
+    },
+    "SecurityHubRule622632C4": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "EventPattern": {
+          "detail": {
+            "findings": {
+              "Severity": {
+                "Label": [
+                  "CRITICAL",
+                  "HIGH"
+                ]
+              }
+            }
+          },
+          "detail-type": [
+            "Security Hub Findings - Imported"
+          ],
+          "source": [
+            "aws.securityhub"
+          ]
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Ref": "SecurityHubFindings4340085C"
+            },
+            "Id": "Target0"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/SecurityHubRule/Resource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Analytics": "v2:deflate64:H4sIAAAAAAAA/01P0U7DMAz8lr2nHlMFEm+wSXuuOn4g88wwbZIpdkBTlH+naQfsxXfnk+50G9i0j/CwerHf0uBpWGcMkSAf1OJgXkVIJ3pmfza74EVjQjW7d9/ZaB0pxSp6kpAiUjE1JYsXyG/hwljNhcy3CyPj9e95k4d0FIx8UQ6+eve6GLYOch9Gmosq/qcsrJjRuuPJQt4nj78p97yj6FhkzpO2sXWVwDxu0rBNOJBurZChL/KTlft0K5ywlGK6q34Ev27hGZ5Wn8LcxOSVHUG/4A89jSyLSAEAAA=="
+      },
+      "Metadata": {
+        "aws:cdk:path": "SecurityHubToJiraStack/CDKMetadata/Default"
+      }
+    }
+  },
+  "Parameters": {
+    "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3Bucket00C9E3E6": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277\""
+    },
+    "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277S3VersionKey1727EC66": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277\""
+    },
+    "AssetParameters70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277ArtifactHash38D5187E": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"70cb420a8d719e10119d07f40b66fe9e6c1b0848e4aa2ab4b67e847f9a29a277\""
+    }
+  }
+}
